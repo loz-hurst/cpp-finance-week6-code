@@ -25,8 +25,9 @@
 #include "BlackScholes.hpp"
 #include "mathutils.hpp"
 #include <cmath>
+#include <memory>
 
-namespace BlackScholes {
+namespace {
     // The struct FormulaValues and CalculateBsValues are only used in this file, so not needed in the header.
 
     // Struct for passing calculated values
@@ -36,44 +37,54 @@ namespace BlackScholes {
         double d2;
     };
 
-    // Calculates values used in Black-Scholes formulae from data, stores result in values
-    void CalculateBsValues(const Data &data, FormulaValues &values) {
+    // Calculates values used in Black-Scholes formulae from data, returns a unique_ptr to a populated FormulaValues
+    std::unique_ptr<FormulaValues> CalculateBsValues(const BlackScholes::Data &data) {
+        std::unique_ptr<FormulaValues> result {std::make_unique<FormulaValues>(FormulaValues {0, 0, 0})};
         // This value gets used a couple of times, so calculate it once
         double sig_sqrt_t = data.sigma * std::sqrt(data.maturity);
 
         // PV(K)
-        values.pv_k = data.strike * std::exp(-data.rate * data.maturity);
+        result->pv_k = data.strike * std::exp(-data.rate * data.maturity);
 
         // d1
-        values.d1 = (std::log(data.value / data.strike) + (data.rate + 0.5 * data.sigma * data.sigma) * data.maturity) /
-                    sig_sqrt_t;
+        result->d1 = (std::log(data.value / data.strike) + (data.rate + 0.5 * data.sigma * data.sigma) * data.maturity) /
+                     sig_sqrt_t;
 
         // d2
-        values.d2 = values.d1 - sig_sqrt_t;
-    }
+        result->d2 = result->d1 - sig_sqrt_t;
 
+        return result;
+    }
+}
+
+namespace BlackScholes {
     double Call(const Data &data) {
         // Using formula C(St,t)=N(d1)St - N(d2)PV(K)
-        FormulaValues values{0, 0, 0};
-        CalculateBsValues(data, values);
+        std::unique_ptr<::FormulaValues> values {::CalculateBsValues(data)};
 
         // Normal values
-        double n1{mathutils::normal(values.d1)};
-        double n2{mathutils::normal(values.d2)};
+        double n1{mathutils::normal(values->d1)};
+        double n2{mathutils::normal(values->d2)};
 
-        return data.value * n1 - values.pv_k * n2;
+        return data.value * n1 - values->pv_k * n2;
     }
 
     double Put(const Data &data) {
         // Using formula P(St,t)=N(-d2)PV(K) - N(-d1)St
-        FormulaValues values{0, 0, 0};
-        CalculateBsValues(data, values);
+        std::unique_ptr<::FormulaValues> values {::CalculateBsValues(data)};
 
         // Normal values
-        double n1{mathutils::normal(-values.d1)};
-        double n2{mathutils::normal(-values.d2)};
+        double n1{mathutils::normal(-values->d1)};
+        double n2{mathutils::normal(-values->d2)};
 
-        return values.pv_k * n2 - data.value * n1;
+        return values->pv_k * n2 - data.value * n1;
+    }
+
+    double Vega(const Data &data) {
+        std::unique_ptr<::FormulaValues> values {::CalculateBsValues(data)};
+
+        // Derivative of the CDF is the standard normal distribution: e^(-x^2/2)/sqrt(2*PI)
+        return data.value * std::exp(-0.5*values->d1*values->d1)/std::sqrt(2*mathutils::PI);
     }
 
 }

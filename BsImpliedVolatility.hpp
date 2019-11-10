@@ -22,37 +22,24 @@
  * full licence.
  */
 
-#ifndef CPP_FINANCE_WEEK6_BLACKSCHOLES_HPP
-#define CPP_FINANCE_WEEK6_BLACKSCHOLES_HPP
+#ifndef CPP_FINANCE_WEEK6_CODE_BSIMPLIEDVOLATILITY_HPP
+#define CPP_FINANCE_WEEK6_CODE_BSIMPLIEDVOLATILITY_HPP
+
+#include "BlackScholes.hpp"
 
 namespace BlackScholes {
-
-    // Get or put?
-    enum class OptionType {
-        Call,
-        Put
-    };
-
-    // structure for variables required to calculate Black-Scholes options
-    struct Data {
-        double value;
-        double strike;
-        double maturity;
-        double rate;
-        double sigma;
-        OptionType type;
-    };
-
-    // Calculate the Black-Scholes call price for the given data
-    double Call(const Data &);
-
-    // Calculate the Black-Scholes put price for the given data
-    double Put(const Data &);
-
-    // Calculate the Black-Scholes Vega function (is the same for Call and Put options)
-    double Vega(const Data &);
-
-    // Calculate the Black-Scholes price for the given data
-    double Option(const Data &);
+    /* Estimates the volatility using a Newton Raphson method
+     * Arguments:
+     *   data - BlackScholes::Data for the option
+     *   market_price - current price calculating for
+     *   initial_guess - initial value for sigma
+     *   max_iterations - maximum loops to try and achieve the tolerance (default 100)
+     *   tolerance - if this tolerance is reached will exit immediately
+     * Returns:
+     *   calculated sigma
+     */
+    double ImpliedVolatility(const Data & data, const double market_price, const double initial_guess,
+                      const double max_iterations=100, const double tolerance=0.00000000001);
 }
-#endif //CPP_FINANCE_WEEK6_BLACKSCHOLES_HPP
+
+#endif //CPP_FINANCE_WEEK6_CODE_BSIMPLIEDVOLATILITY_HPP

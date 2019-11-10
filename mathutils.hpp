@@ -26,6 +26,8 @@
 #define CPP_FINANCE_WEEK6_CODE_MATHUTILS_HPP
 
 namespace mathutils {
+    // Constant providing a value for PI until C++20 'numbers' library is available
+    const double PI {3.141592653589793};
     // normal cumulative distribution function
     double normal(double);
 }
