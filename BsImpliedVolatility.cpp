@@ -29,31 +29,30 @@
 
 namespace {
     // Function to print out values during the loop - you might find it useful
-    void Output(int i, double v, double der, double sigma)
+    void Output(int i, double bs, double vega, double sigma)
     {
         std::cout << std::setw(2) << i;
-        std::cout << std::setw(8) << std::setprecision(4) << v;
-        std::cout << std::setw(8) << std::setprecision(4) << der;
+        std::cout << std::setw(8) << std::setprecision(4) << bs;
+        std::cout << std::setw(8) << std::setprecision(4) << vega;
         std::cout << std::setw(12) << std::setprecision(6) << sigma;
         std::cout << std::endl;
     }
 }
 
 namespace BlackScholes {
-    double ImpliedVolatility (
-            const Data & data, const double market_price, const double initial_guess,
-            const double max_iterations, const double tolerance
-    ){
+    double ImpliedVolatility(const Data &data, const double market_price, const double initial_guess,
+                             const double max_iterations, const double tolerance) {
         // Make a copy so we don't change the original - only safe because Data contains just primitive values
         Data our_data {data};
         our_data.sigma = initial_guess;
 
-        double v {BlackScholes::Option(data)};
-        double der {BlackScholes::Vega(data)};
+        double bs {BlackScholes::Option(our_data)};
+        double vega {BlackScholes::Vega(our_data)};
 
         for (int i {0}; max_iterations > i; ++i) {
             // Don't forget to break if the tolerance is reached.
-            ::Output(i, v, der, our_data.sigma);
+            ::Output(i, bs, vega, our_data.sigma);
+
         }
 
         return our_data.sigma;

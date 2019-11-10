@@ -22,7 +22,9 @@
  * full licence.
  */
 
+#include <fstream>
 #include <iostream>
+#include <string>
 #include "BlackScholes.hpp"
 #include "BsImpliedVolatility.hpp"
 
@@ -41,18 +43,27 @@ int main() {
 
     // Exercise 2
 
+    // You will need to comment out one of these while you work on the other one:
     // Exercise 2.1
-    const BlackScholes::Data ex2_bs_data {BlackScholes::Read()};
+    const std::unique_ptr<BlackScholes::Data> ex2_bs_data {BlackScholes::Read()};
     // Exercise 2.2
-    const BlackScholes::Data ex2_bs_data {BlackScholes::Read("../bs.dat")};
+    const std::string ex2_filename {"..\\bs.dat"};
+    std::ifstream in_str {ex2_filename};
+    if (!in_str.good()) {
+        std::cerr << "Error opening file: " << ex2_filename << "!" << std::endl;
+        return 1;
+    }
+    const std::unique_ptr<BlackScholes::Data> ex2_bs_data {BlackScholes::Read(in_str)};
+    in_str.close();
 
-    std::cout << "BlackScholes values:" <<
-                " Strike: " << ex2_bs_data.strike <<
-                " Maturity: " << ex2_bs_data.maturity <<
-                " Value: " << ex2_bs_data.value <<
-                " Risk-free rate: " << ex2_bs_data.rate <<
-                " Volitility: " << ex2_bs_data.sigma <<
-                " Tyoe: " << ((ex2_bs_data.type == BlackScholes::OptionType::Call) ? "call" : "put") <<
+    // Print out the values from whichever version of Read was used.
+    std::cout << "Black-Scholes values:" <<
+                " Strike: " << ex2_bs_data->strike <<
+                " Maturity: " << ex2_bs_data->maturity <<
+                " Value: " << ex2_bs_data->value <<
+                " Risk-free rate: " << ex2_bs_data->rate <<
+                " Volatility: " << ex2_bs_data->sigma <<
+                " Type: " << ((ex2_bs_data->type == BlackScholes::OptionType::Call) ? "call" : "put") <<
                 std::endl;
 
     // Exercise 3

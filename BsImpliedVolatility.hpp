@@ -38,8 +38,8 @@ namespace BlackScholes {
      * Returns:
      *   calculated sigma
      */
-    double ImpliedVolatility(const Data & data, const double market_price, const double initial_guess,
-                      const double max_iterations=100, const double tolerance=0.00000000001);
+    double ImpliedVolatility(const Data & data, double market_price, double initial_guess,
+                      double max_iterations=100, double tolerance=0.00000000001);
 }
 
 #endif //CPP_FINANCE_WEEK6_CODE_BSIMPLIEDVOLATILITY_HPP
