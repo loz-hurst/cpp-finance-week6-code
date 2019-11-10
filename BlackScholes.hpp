@@ -52,7 +52,7 @@ namespace BlackScholes {
     // Calculate the Black-Scholes Vega function (is the same for Call and Put options)
     double Vega(const Data &);
 
-    // Calculate the Black-Scholes price for the given data
+    // Calculate the Black-Scholes price for the given data - replaces Call() and Put()
     double Option(const Data &);
 }
 #endif //CPP_FINANCE_WEEK6_BLACKSCHOLES_HPP
